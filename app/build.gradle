@@ -1,0 +1,77 @@
+repositories {
+  maven { url "https://github.com/uPhyca/stetho-realm/raw/master/maven-repo" }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'realm-android'
+
+apply from: "$project.rootDir/QA/script-git-version.gradle"
+apply from: "$project.rootDir/QA/script-findbugs.gradle"
+apply from: "$project.rootDir/QA/script-lint.gradle"
+apply from: "$project.rootDir/QA/script-pmd.gradle"
+
+android {
+  ext.versao = "1.0"
+  compileSdkVersion 25
+  buildToolsVersion "25.0.2"
+
+  defaultConfig {
+    applicationId "br.com.thiagopsnfg.lucktracer"
+    minSdkVersion 15
+    targetSdkVersion 25
+    versionCode 1
+    versionName "$versao"
+    multiDexEnabled true
+    vectorDrawables.useSupportLibrary = true
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_7
+    targetCompatibility JavaVersion.VERSION_1_7
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+    debug {
+      debuggable true
+    }
+  }
+
+  sourceSets {
+    development {
+      java.srcDirs 'src/development/java'
+      res.srcDirs 'src/development/res'
+    }
+    distribution {
+      java.srcDirs 'src/distribution/java'
+      res.srcDirs 'src/distribution/res'
+    }
+  }
+
+  productFlavors {
+    development {
+      applicationId "br.com.thiagopsnfg.dev"
+      versionCode gitVersionCodeTime
+      versionName gitVersionName
+    }
+    distribution {
+      applicationId "br.com.thiagopsnfg"
+      versionName "$versao"
+    }
+  }
+}
+
+dependencies {
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    exclude group: 'com.android.support', module: 'support-annotations'
+  })
+  compile 'com.android.support:appcompat-v7:25.2.0'
+  compile 'com.android.support.constraint:constraint-layout:1.0.1'
+  testCompile 'junit:junit:4.12'
+}
